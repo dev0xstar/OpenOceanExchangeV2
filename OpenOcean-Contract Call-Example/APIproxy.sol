@@ -54,7 +54,19 @@ contract APIproxy {
         }
     }
 
-    
+    function _transfer(
+        address token,
+        address payable to,
+        uint256 amount
+    ) internal {
+        if (amount > 0) {
+            if (token == _ETH_ADDRESS_) {
+                to.transfer(amount);
+            } else {
+                IERC20(token).safeTransfer(to, amount);
+            }
+        }
+    }
 
     
 
