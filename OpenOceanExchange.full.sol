@@ -1210,7 +1210,10 @@ contract OpenOceanExchange is OwnableUpgradeable, PausableUpgradeable {
         address referrer
     );
 
-    
+    function initialize() public initializer {
+        OwnableUpgradeable.__Ownable_init();
+        PausableUpgradeable.__Pausable_init();
+    }
 
     
 
