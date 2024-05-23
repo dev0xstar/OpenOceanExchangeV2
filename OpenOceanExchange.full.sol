@@ -1215,7 +1215,43 @@ contract OpenOceanExchange is OwnableUpgradeable, PausableUpgradeable {
         PausableUpgradeable.__Pausable_init();
     }
 
-    
+    function swap(
+        IOpenOceanCaller caller,
+        SwapDescription calldata desc,
+        IOpenOceanCaller.CallDescription[] calldata calls
+    ) external payable whenNotPaused returns (uint256 returnAmount) {
+        require(desc.minReturnAmount > 0, "Min return should not be 0");
+        require(calls.length > 0, "Call data should exist");
+
+        uint256 flags = desc.flags;
+        IERC20 srcToken = desc.srcToken;
+        IERC20 dstToken = desc.dstToken;
+
+        require(msg.value == (srcToken.isETH() ? desc.amount : 0), "Invalid msg.value");
+
+        if (flags & _SHOULD_CLAIM != 0) {
+            require(!srcToken.isETH(), "Claim token is ETH");
+            _claim(srcToken, desc.srcReceiver, desc.amount, desc.permit);
+        }
+
+        address dstReceiver = (desc.dstReceiver == address(0)) ? msg.sender : desc.dstReceiver;
+        uint256 initialSrcBalance = (flags & _PARTIAL_FILL != 0) ? srcToken.universalBalanceOf(msg.sender) : 0;
+        uint256 initialDstBalance = dstToken.universalBalanceOf(dstReceiver);
+
+        caller.makeCalls{value: msg.value}(calls);
+
+        uint256 spentAmount = desc.amount;
+        returnAmount = dstToken.universalBalanceOf(dstReceiver).sub(initialDstBalance);
+
+        if (flags & _PARTIAL_FILL != 0) {
+            spentAmount = initialSrcBalance.add(desc.amount).sub(srcToken.universalBalanceOf(msg.sender));
+            require(returnAmount.mul(desc.amount) >= desc.minReturnAmount.mul(spentAmount), "Return amount is not enough");
+        } else {
+            require(returnAmount >= desc.minReturnAmount, "Return amount is not enough");
+        }
+
+        _emitSwapped(desc, srcToken, dstToken, dstReceiver, spentAmount, returnAmount);
+    }
 
     function _emitSwapped(
         SwapDescription calldata desc,
