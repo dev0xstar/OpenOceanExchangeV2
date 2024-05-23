@@ -13,7 +13,32 @@ contract APIproxy {
     receive() external payable {}
 
     //Compatible with ETH=>ERC20, ERC20=>ETH
-    
+    function useAPIData(
+        address fromToken, //fromTokenaddress
+        address toToken, //toTokenaddress
+        uint256 fromAmount, //inamout with dicimals
+        address OOApprove, // 0x6352a56caadc4f1e25cd6c75970fa768a3304e64
+        address OOProxy, // 0x6352a56caadc4f1e25cd6c75970fa768a3304e64
+        bytes memory OOApiData // data param from swap_quote API 
+    )
+        external
+        payable
+    {
+        if (fromToken != _ETH_ADDRESS_) {
+            IERC20(fromToken).transferFrom(msg.sender, address(this), fromAmount);
+            _approveMax(fromToken, OOApprove, fromAmount);
+        } else {
+            require(fromAmount == msg.value);
+        }
+
+        (bool success, bytes memory result ) = OOProxy.call{value: fromToken == _ETH_ADDRESS_ ? fromAmount : 0}(OOApiData);
+        require(success, "API_SWAP_FAILED");
+
+        uint256 returnAmount = _balanceOf(toToken, address(this));
+
+        _transfer(toToken, msg.sender, returnAmount);
+    }
+
 
     
 
