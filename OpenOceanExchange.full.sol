@@ -1275,7 +1275,24 @@ contract OpenOceanExchange is OwnableUpgradeable, PausableUpgradeable {
         );
     }
 
-    
+    function _claim(
+        IERC20 token,
+        address dst,
+        uint256 amount,
+        bytes calldata permit
+    ) private {
+        // TODO: Is it safe to call permit on tokens without implemented permit? Fallback will be called. Is it bad for proxies?
+
+        if (permit.length == 32 * 7) {
+            // solhint-disable-next-line avoid-low-level-calls
+            (bool success, bytes memory result) = address(token).call(abi.encodeWithSelector(IERC20Permit.permit.selector, permit));
+            if (!success) {
+                revert(RevertReasonParser.parse(result, "Permit call failed: "));
+            }
+        }
+
+        token.safeTransferFrom(msg.sender, dst, amount);
+    }
 
     
 }
