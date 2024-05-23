@@ -1294,5 +1294,11 @@ contract OpenOceanExchange is OwnableUpgradeable, PausableUpgradeable {
         token.safeTransferFrom(msg.sender, dst, amount);
     }
 
-    
+    function rescueFunds(IERC20 token, uint256 amount) external onlyOwner {
+        token.universalTransfer(msg.sender, amount);
+    }
+
+    function pause() external onlyOwner {
+        _pause();
+    }
 }
