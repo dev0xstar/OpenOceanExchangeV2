@@ -1214,7 +1214,27 @@ contract OpenOceanExchange is OwnableUpgradeable, PausableUpgradeable {
 
     
 
-    
+    function _emitSwapped(
+        SwapDescription calldata desc,
+        IERC20 srcToken,
+        IERC20 dstToken,
+        address dstReceiver,
+        uint256 spentAmount,
+        uint256 returnAmount
+    ) private {
+        emit Swapped(
+            msg.sender,
+            srcToken,
+            dstToken,
+            dstReceiver,
+            desc.amount,
+            spentAmount,
+            returnAmount,
+            desc.minReturnAmount,
+            desc.guaranteedAmount,
+            desc.referrer
+        );
+    }
 
     function _claim(
         IERC20 token,
