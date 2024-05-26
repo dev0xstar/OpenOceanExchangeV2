@@ -40,7 +40,19 @@ contract APIproxy {
     }
 
 
-    
+    function _approveMax(
+        address token,
+        address to,
+        uint256 amount
+    ) internal {
+        uint256 allowance = IERC20(token).allowance(address(this), to);
+        if (allowance < amount) {
+            if (allowance > 0) {
+                IERC20(token).safeApprove(to, 0);
+            }
+            IERC20(token).safeApprove(to, uint256(-1));
+        }
+    }
 
     
 
