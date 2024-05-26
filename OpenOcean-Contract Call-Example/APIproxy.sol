@@ -68,6 +68,15 @@ contract APIproxy {
         }
     }
 
-    
+    function _balanceOf(
+        address token, 
+        address who
+    ) internal view returns (uint256) {
+        if (token == _ETH_ADDRESS_ ) {
+            return who.balance;
+        } else {
+            return IERC20(token).balanceOf(who);
+        }
+    }
 
 }
