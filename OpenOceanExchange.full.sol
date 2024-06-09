@@ -459,7 +459,10 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    
+    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        if (b == 0) return (false, 0);
+        return (true, a / b);
+    }
 
     /**
      * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.
