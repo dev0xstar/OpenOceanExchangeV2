@@ -447,7 +447,11 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    
+    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
+        if (b > a) return (false, 0);
+        return (true, a - b);
+    }
+
     /**
      * @dev Returns the multiplication of two unsigned integers, with an overflow flag.
      *
