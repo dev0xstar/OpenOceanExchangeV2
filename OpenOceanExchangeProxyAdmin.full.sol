@@ -420,6 +420,13 @@ contract UpgradeableProxy is Proxy {
     /**
      * @dev Returns the current implementation address.
      */
+    function _implementation() internal view virtual override returns (address impl) {
+        bytes32 slot = _IMPLEMENTATION_SLOT;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            impl := sload(slot)
+        }
+    }
 
     /**
      * @dev Upgrades the proxy to a new implementation.
