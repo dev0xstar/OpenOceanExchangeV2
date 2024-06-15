@@ -425,7 +425,11 @@ contract UpgradeableProxy is Proxy {
      * @dev Upgrades the proxy to a new implementation.
      *
      * Emits an {Upgraded} event.
-
+     */
+    function _upgradeTo(address newImplementation) internal virtual {
+        _setImplementation(newImplementation);
+        emit Upgraded(newImplementation);
+    }
 
     /**
      * @dev Stores a new address in the EIP1967 implementation slot.
