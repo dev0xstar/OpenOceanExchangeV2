@@ -497,7 +497,21 @@ contract TransparentUpgradeableProxy is UpgradeableProxy {
      *
      * NOTE: Only the admin can call this function. See {ProxyAdmin-upgradeAndCall}.
      */
+    function upgradeToAndCall(address newImplementation, bytes calldata data) external payable virtual ifAdmin {
+        _upgradeTo(newImplementation);
+        Address.functionDelegateCall(newImplementation, data);
+    }
 
+    /**
+     * @dev Returns the current admin.
+     */
+    function _admin() internal view virtual returns (address adm) {
+        bytes32 slot = _ADMIN_SLOT;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            adm := sload(slot)
+        }
+    }
 
     /**
      * @dev Stores a new address in the EIP1967 admin slot.
