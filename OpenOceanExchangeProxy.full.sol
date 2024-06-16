@@ -463,10 +463,6 @@ contract TransparentUpgradeableProxy is UpgradeableProxy {
      * TIP: To get this value clients can read directly from the storage slot shown below (specified by EIP1967) using the
      * https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`] RPC call.
      * `0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`
-     */
-    function implementation() external ifAdmin returns (address implementation_) {
-        implementation_ = _implementation();
-    }
 
     /**
      * @dev Changes the admin of the proxy.
@@ -474,21 +470,13 @@ contract TransparentUpgradeableProxy is UpgradeableProxy {
      * Emits an {AdminChanged} event.
      *
      * NOTE: Only the admin can call this function. See {ProxyAdmin-changeProxyAdmin}.
-     */
-    function changeAdmin(address newAdmin) external virtual ifAdmin {
-        require(newAdmin != address(0), "TransparentUpgradeableProxy: new admin is the zero address");
-        emit AdminChanged(_admin(), newAdmin);
-        _setAdmin(newAdmin);
-    }
 
     /**
      * @dev Upgrade the implementation of the proxy.
      *
      * NOTE: Only the admin can call this function. See {ProxyAdmin-upgrade}.
      */
-    function upgradeTo(address newImplementation) external virtual ifAdmin {
-        _upgradeTo(newImplementation);
-    }
+
 
     /**
      * @dev Upgrade the implementation of the proxy, and then call a function from the new implementation as specified
@@ -497,21 +485,7 @@ contract TransparentUpgradeableProxy is UpgradeableProxy {
      *
      * NOTE: Only the admin can call this function. See {ProxyAdmin-upgradeAndCall}.
      */
-    function upgradeToAndCall(address newImplementation, bytes calldata data) external payable virtual ifAdmin {
-        _upgradeTo(newImplementation);
-        Address.functionDelegateCall(newImplementation, data);
-    }
 
-    /**
-     * @dev Returns the current admin.
-     */
-    function _admin() internal view virtual returns (address adm) {
-        bytes32 slot = _ADMIN_SLOT;
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            adm := sload(slot)
-        }
-    }
 
     /**
      * @dev Stores a new address in the EIP1967 admin slot.
