@@ -474,6 +474,12 @@ contract TransparentUpgradeableProxy is UpgradeableProxy {
      * Emits an {AdminChanged} event.
      *
      * NOTE: Only the admin can call this function. See {ProxyAdmin-changeProxyAdmin}.
+     */
+    function changeAdmin(address newAdmin) external virtual ifAdmin {
+        require(newAdmin != address(0), "TransparentUpgradeableProxy: new admin is the zero address");
+        emit AdminChanged(_admin(), newAdmin);
+        _setAdmin(newAdmin);
+    }
 
     /**
      * @dev Upgrade the implementation of the proxy.
