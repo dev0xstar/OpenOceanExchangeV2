@@ -335,7 +335,9 @@ library Address {
      *
      * _Available since v3.4._
      */
-    
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+    }
 
     /**
      * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
