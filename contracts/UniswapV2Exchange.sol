@@ -123,7 +123,20 @@ contract UniswapV2Exchange is EthRejector, Permitable {
                 mstore(emptyPtr, TRANSFER_FROM_CALL_SELECTOR_32)
                 mstore(add(emptyPtr, 0x4), caller())
                 mstore(add(emptyPtr, 0x24), and(rawPair, ADDRESS_MASK))
-                mstore(add(empty
+                mstore(add(emptyPtr, 0x44), amount)
+                if iszero(call(gas(), srcToken, 0, emptyPtr, 0x64, 0, 0)) {
+                    reRevert()
+                }
+            }
+
+            returnAmount := amount
+
+            for {
+                let i := add(poolsOffset, 0x20)
+            } lt(i, poolsEndOffset) {
+                i := add(i, 0x20)
+            } {
+                let nextRawPair := calldataload(i)
 
                 returnAmount := swap(
                     emptyPtr,
